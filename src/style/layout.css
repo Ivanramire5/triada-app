@@ -1,0 +1,46 @@
+/* Contenedor principal de la navegación */
+.sidebar-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: center; /* ESTO CENTRA LOS ELEMENTOS */
+    gap: 40px; /* Aumenté un poco el gap para que queden más espaciados */
+    align-items: center;
+    background-color: #C2410C; /* Color de fondo del contenedor */
+    padding-bottom: 10px; /* Espacio debajo del contenedor */
+    padding-top: 10px; /* Espacio arriba del contenedor */
+    margin-bottom: 15px; /* Espacio debajo del contenedor para separar del contenido */
+}
+
+/* Cada enlace individual (Ícono + Texto) */
+.nav-link {
+    display: flex;
+    align-items: center; /* Centra el ícono con el texto para que no queden chuecos */
+    gap: 8px; /* Espacio pequeñito entre el dibujo y la palabra */
+    text-decoration: none; /* Quita el subrayado por defecto de los links */
+    color: #FAF3EE; /* Color del texto y el ícono */
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+/* Efecto hover sutil al pasar el mouse */
+.nav-link:hover {
+    color: #3F7A5C; /* Color azul de Bootstrap o el que uses en tu Figma */
+}
+.app-title{
+    color: #FAF3EE;
+    background-color: #0B4F6C;
+    padding-top: 20px;
+    text-align: left;
+    padding-left: 30px;
+    padding-bottom: 10px;
+}
+.topbar-title{
+    background-color: #0B4F6C;
+    color: #FAF3EE;
+    text-align: center;
+}
+.topbar{
+    background-color: #0B4F6C;
+    margin-bottom: -8px;
+    margin-top: -8px;
+}

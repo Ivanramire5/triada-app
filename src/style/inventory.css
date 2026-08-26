@@ -1,0 +1,277 @@
+/* =========================================
+   Fondo oscuro y desenfocado del Pop-up
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px); /* Este es el truco para el efecto moderno */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.25s ease-out;
+}
+
+/* =========================================
+   La tarjeta del cartel (Estilo SweetAlert)
+   ========================================= */
+.modal-content {
+    background-color: #ffffff;
+    padding: 35px 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-align: center; /* Todo centrado como en las alertas */
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.modal-content p {
+    color: #555;
+    margin-bottom: 10px;
+}
+
+/* =========================================
+   Campos de Texto
+   ========================================= */
+.product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #7066e0; /* Color de enfoque vibrante */
+    box-shadow: 0 0 0 3px rgba(112, 102, 224, 0.15);
+}
+
+/* =========================================
+   Botones de Acción (Guardar / Cancelar)
+   ========================================= */
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.btn-save, .btn-confirm-sale, .btn-cancel {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s, box-shadow 0.2s;
+}
+
+.btn-save, .btn-confirm-sale {
+    background-color: #7066e0; /* Azul/Púrpura estilo alerta de éxito */
+    color: white;
+    box-shadow: 0 4px 10px rgba(112, 102, 224, 0.3);
+}
+
+.btn-cancel {
+    background-color: #dc3545; /* Rojo para cancelar/cerrar */
+    color: white;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+
+.btn-save:hover, .btn-confirm-sale:hover, .btn-cancel:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-save:active, .btn-confirm-sale:active, .btn-cancel:active {
+    transform: translateY(1px);
+}
+
+/* =========================================
+   Animaciones Fluidas
+   ========================================= */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.7); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* =========================================
+   Selector de cantidad (Modal de Ventas)
+   ========================================= */
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+    font-size: 18px;
+    font-weight: bold;
+}
+/* =========================================
+   Estilos de la Tabla de Inventario
+   ========================================= */
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra sutil para la tabla */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.inventory-table thead {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.inventory-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+.inventory-table td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f3f5;
+    color: #555;
+    text-align: center; /* Centrado para simetría */
+}
+
+/* Efecto hover en las filas para facilitar la lectura */
+.inventory-table tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+/* =========================================
+   Botones de Acción en la Tabla
+   ========================================= */
+.actions-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Botones de + y - */
+.btn-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-icon:hover {
+    background-color: #e9ecef;
+}
+
+/* Botón de Editar (Borde Azul) */
+.btn-edit {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #0d6efd;
+    background-color: transparent;
+    color: #0d6efd;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Botón de Eliminar (Borde Rojo) */
+.btn-delete {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Botón de Vender (Fondo Verde) */
+.btn-sell {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    background-color: #198754;
+    color: white;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.btn-sell:hover {
+    background-color: #157347;
+    transform: translateY(-1px);
+}
+
+.inventory-table thead,
+.table-header {
+    background-color: transparent; /* Mantiene la fila completa transparente */
+    border-bottom: none; 
+}
+
+
+th.table-text {
+  background-color: #3F7A5C;
+  color: #FAF3EE; /* Ahora sí aplicará tu color crema */
+  font-size: 13px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 15px 30px; /* Un padding más parejo */
+  text-align: center; /* Ahora sí se centrará */
+  vertical-align: middle;
+}

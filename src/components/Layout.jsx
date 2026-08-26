@@ -1,24 +1,33 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
+import '../style/layout.css';
 
 export default function Layout() {
     return (
-    <div className="layout-container">
-        <aside className="sidebar">
-            <h2>Mi App de Inventario</h2>
-            <nav>
-            {/* Aquí irán los links de navegación luego */}
-                <p>Productos</p>
-            </nav>
-        </aside>
+        <div className="layout-container">
+        <h1 className="app-title">Triada</h1>
+        
         
         <main className="main-content">
             <header className="topbar">
-                <h1>Panel de Control</h1>
+            <h3 className="topbar-title">Gestión de Inventario</h3>
             </header>
+            <aside className="sidebar">
+            <nav className="sidebar-nav">
+                <Link to="/" className="nav-link">
+                <i className="bi bi-bag-fill"></i>
+                Inventario
+                </Link>
+                
+                <Link to="/metrics" className="nav-link">
+                <i className="bi bi-database-fill"></i>
+                Métricas
+                </Link>
+            </nav>
+            </aside>
             <section className="content-area">
-                <Outlet /> 
+            <Outlet /> 
             </section>
         </main>
-    </div>
+        </div>
     );
 }

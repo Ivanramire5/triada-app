@@ -1,4 +1,5 @@
 import { useInventoryStore } from '../store/useInventoryStore';
+import '../style/metrics.css';
 
 export default function Metrics() {
     const products = useInventoryStore((state) => state.products);
@@ -9,12 +10,12 @@ export default function Metrics() {
 
     return (
         <div className="metrics-container">
-        <h2>Métricas del Local</h2>
+        <h2 className='metrics-title'>Métricas del Local</h2>
         <hr className="metrics-divider" />
         
         <div className="metrics-card">
             <div className="metrics-header">
-            <h4>🔥 Top 5 Productos Más Vendidos</h4>
+                <h3 className="metrics-subtitle">Top 5 Productos Más Vendidos</h3>
             </div>
             <ul className="metrics-list">
             {topSellingProducts.length > 0 ? (

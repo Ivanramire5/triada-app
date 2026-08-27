@@ -88,9 +88,9 @@ export default function Inventory() {
           className="search-input"
         />
         <button onClick={() => { closeModal(); setIsModalOpen(true); }} className="btn-add">
-          + Agregar Producto
+          <i className="bi bi-plus-circle"></i> Agregar Producto
         </button>
-      </div>
+    </div>
 
       <table className="inventory-table">
         <thead>

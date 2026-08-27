@@ -20,7 +20,7 @@
    La tarjeta del cartel (Estilo SweetAlert)
    ========================================= */
 .modal-content {
-    background-color: #ffffff;
+    background-color: #FAF3EE;
     padding: 35px 30px;
     border-radius: 16px;
     width: 90%;
@@ -31,21 +31,59 @@
 }
 
 .modal-content h3 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: #333;
+    color: #FAF3EE;
+    background-color: #0B4F6C;
     font-size: 24px;
     font-weight: 600;
+    
+    /* --- EL TRUCO DE LOS MÁRGENES NEGATIVOS --- */
+    margin-top: -35px;     /* Estira el fondo azul hacia arriba */
+    margin-left: -30px;    /* Estira el fondo azul hacia la izquierda */
+    margin-right: -30px;   /* Estira el fondo azul hacia la derecha */
+    
+    /* --- ESTILO INTERNO Y CURVATURA --- */
+    padding: 20px 0;       /* Le damos aire al texto para que no quede aplastado */
+    border-top-left-radius: 16px;  /* Copia la curva exacta de tu tarjeta verde */
+    border-top-right-radius: 16px;
+    margin-bottom: 25px;   /* Separa el encabezado azul del formulario */
 }
 
 .modal-content p {
     color: #555;
     margin-bottom: 10px;
 }
+.btn-cancel {
+    background-color: #C2410C; /* Naranja base por defecto */
+    color: #FAF3EE;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(194, 65, 12, 0.3); 
+    transition: all 0.2s ease;
+}
 
-/* =========================================
-   Campos de Texto
-   ========================================= */
+/* Efecto al pasar el mouse (Este estaba perfecto) */
+.btn-cancel:hover {
+    background-color: #a3360a; 
+    transform: translateY(-2px);
+}
+
+/* Quitamos el ".submit" que estaba sobrando al principio */
+.btn-save {
+    background-color: #157347; /* Verde base por defecto */
+    color: #FAF3EE;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(21, 115, 71, 0.3); 
+    transition: all 0.2s ease;
+}
 .product-form {
     display: flex;
     flex-direction: column;
@@ -274,4 +312,69 @@ th.table-text {
   padding: 15px 30px; /* Un padding más parejo */
   text-align: center; /* Ahora sí se centrará */
   vertical-align: middle;
+}
+
+/* =========================================
+   Barra de Herramientas (Búsqueda y Agregar)
+   ========================================= */
+.toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 65px;
+    margin-bottom: 25px;
+    gap: 15px;
+    flex-wrap: wrap; /* Evita que se rompa en pantallas más chicas */
+}
+
+/* --- Input de Búsqueda --- */
+.search-input {
+    flex: 1; /* Hace que la barra ocupe el espacio disponible */
+    max-width: 450px;
+    padding: 12px 20px;
+    border: 1px solid #EAE3D9;
+    border-radius: 30px; /* Bordes bien redondeados */
+    font-size: 14px;
+    color: #333;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3F7A5C; /* El verde de tu encabezado */
+    box-shadow: 0 0 0 3px rgba(63, 122, 92, 0.15); /* Resplandor al hacer clic */
+}
+
+/* --- Botón de Agregar Producto --- */
+.btn-add {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Separación perfecta entre el ícono y el texto */
+    background-color: #3F7A5C; /* Verde principal */
+    color: #FAF3EE; /* Texto color crema */
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px; /* Redondeado igual que el input */
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(63, 122, 92, 0.2);
+    margin-right: 90px;
+}
+
+.btn-add:hover {
+    background-color: #2d5a43; /* Un verde un poco más oscuro */
+    transform: translateY(-2px); /* Efecto de que se levanta un poquito */
+    box-shadow: 0 6px 10px rgba(63, 122, 92, 0.3);
+}
+
+.btn-add i {
+  font-size: 18px; /* Hacemos el ícono de suma un pelín más grande */
+}
+.inventory-container{
+    margin-left: 30px;
+    margin-right: 30px;
 }

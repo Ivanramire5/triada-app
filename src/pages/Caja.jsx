@@ -1,5 +1,6 @@
 import { useInventoryStore } from '../store/useInventoryStore';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import "../style/caja.css"
 
 export default function Caja() {
     const products = useInventoryStore((state) => state.products);
@@ -25,7 +26,7 @@ export default function Caja() {
 
     return (
         <div className="caja-container">
-        <h2 className="caja-title">Control de Caja</h2>
+            <h2 className="caja-title">Control de Caja</h2>
         <hr className="caja-divider" />
         
         <div className="caja-content">

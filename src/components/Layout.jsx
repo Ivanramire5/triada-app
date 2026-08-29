@@ -12,17 +12,23 @@ export default function Layout() {
             <h3 className="topbar-title">Gestión de Inventario</h3>
             </header>
             <aside className="sidebar">
-            <nav className="sidebar-nav">
-                <Link to="/" className="nav-link">
-                <i className="bi bi-bag-fill"></i>
-                Inventario
-                </Link>
-                
-                <Link to="/metrics" className="nav-link">
-                <i className="bi bi-database-fill"></i>
-                Métricas
-                </Link>
-            </nav>
+                <nav className="sidebar-nav">
+                    <Link to="/" className="nav-link">
+                        <i className="bi bi-bag-fill"></i>
+                        Inventario
+                    </Link>
+                    
+                    <Link to="/metrics" className="nav-link">
+                        <i className="bi bi-database-fill"></i>
+                        Métricas
+                    </Link>
+
+                    {/* NUEVO ACCESO: Basado en las ideas de tu captura */}
+                    <Link to="/caja" className="nav-link">
+                        <i className="bi bi-cash-coin"></i>
+                        Cierre de Caja
+                    </Link>
+                </nav>
             </aside>
             <section className="content-area">
             <Outlet /> 

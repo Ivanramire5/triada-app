@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Inventory from './pages/Inventory';
 import Metrics from './pages/Metrics'; // <-- Importamos la nueva página
+import Caja from './pages/Caja'; // <-- Importamos la nueva página
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
           <Route index element={<Inventory />} />
           {/* Nueva ruta de métricas */}
           <Route path="metrics" element={<Metrics />} />
+          <Route path="caja" element={<Caja />} />
         </Route>
       </Routes>
     </BrowserRouter>

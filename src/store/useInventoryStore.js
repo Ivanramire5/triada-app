@@ -32,17 +32,26 @@ export const useInventoryStore = create(
         // ACTUALIZADO: Ahora recibe la cantidad exacta que se vendió
         registerSale: (id, quantity) => set((state) => ({
             products: state.products.map(product => {
-            if (product.id === id && product.stock >= quantity) {
-                return { 
-                ...product, 
-                stock: product.stock - quantity, 
-                sales: (product.sales || 0) + quantity 
-                };
-            }
-            return product;
-            })
+                if (product.id === id && product.stock >= quantity) {
+                    return { 
+                    ...product, 
+                    stock: product.stock - quantity, 
+                    sales: (product.sales || 0) + quantity 
+                    };
+                }
+                return product;
+                })
+            })), // <-- Importante: agregamos una coma aquí
+
+        // NUEVA FUNCIÓN: Reinicia las ventas a cero para el Cierre de Caja
+        resetSales: () => set((state) => ({
+            products: state.products.map(product => ({
+                ...product,
+                sales: 0
+            }))
         }))
         }),
+        
         { name: 'inventory-storage' }
     )
 );

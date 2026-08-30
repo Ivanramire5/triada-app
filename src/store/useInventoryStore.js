@@ -52,6 +52,15 @@ export const useInventoryStore = create(
             return state;
         }),
 
+        // Agrega esto dentro de tu useInventoryStore
+        clearHistory: () => set(() => ({
+            salesHistory: []
+        })),
+
+        deleteHistoryItem: (id) => set((state) => ({
+            salesHistory: state.salesHistory.filter(sale => sale.id !== id)
+        })),
+
         resetSales: () => set((state) => ({
             products: state.products.map(product => ({ ...product, sales: 0 }))
         }))

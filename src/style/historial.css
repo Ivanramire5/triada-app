@@ -1,0 +1,43 @@
+.caja-container{
+    margin: 30px;
+}
+.caja-title{
+    background-color: #FAF3EE;
+}
+.history-date {
+    display: flex;
+    align-items: center; /* Corregido: Esto alinea verticalmente el ícono y el texto */
+    gap: 35px; /* Separación ideal para fechas e íconos */
+    margin: 0;
+    padding-left: 16px;
+    padding-top: 25px;
+    color: #FAF3EE; 
+    font-size: 18px;
+    background-color: #3F7A5C;
+}
+
+/* Regla específica para controlar solo el ícono */
+.history-date i {
+    font-size: 25px;
+    margin-left: 30px; /* Mantenemos el margen que le habíamos dado antes */
+    transform: translateY(-2px); /* Truco mágico: -2px lo sube. Si necesitas que suba más, cámbialo a -3px o -4px */
+}
+
+.history-card-header{
+    background-color: #FFF5E4;
+}
+.history-total{
+    
+}
+.history-item{
+    background-color: #FFF5E4;
+}
+.history-list {
+    background-color: #FFF5E4; /* Fondo crema para todo el bloque de la lista */
+    padding-left: 20px; /* Un pequeño margen para que los puntitos no se peguen al borde */
+}
+
+/* Apuntamos al 'item' (li) y usamos 'color' en lugar de 'background-color' */
+.history-item::marker {
+    color: #FFF5E4; 
+}

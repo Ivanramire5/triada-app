@@ -28,6 +28,10 @@ export default function Layout() {
                         <i className="bi bi-cash-coin"></i>
                         Cierre de Caja
                     </Link>
+                    <Link to="/historial" className="nav-link">
+                        <i className="bi bi-clock-history"></i>
+                        Historial
+                    </Link>
                 </nav>
             </aside>
             <section className="content-area">

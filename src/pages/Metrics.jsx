@@ -16,7 +16,9 @@ export default function Metrics() {
             
             <div className="metrics-card">
                 <div className="metrics-header">
-                    <h3 className="metrics-subtitle">📊 Rendimiento de Todos los Productos</h3>
+                    <h3 className="metrics-subtitle">
+                        <i className="bi bi-bar-chart-line-fill"></i> Rendimiento de Todos los Productos
+                    </h3>
                 </div>
                 <ul className="metrics-list">
                 {allProductsSorted.length > 0 ? (

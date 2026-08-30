@@ -3,6 +3,7 @@ import Layout from './components/Layout';
 import Inventory from './pages/Inventory';
 import Metrics from './pages/Metrics'; // <-- Importamos la nueva página
 import Caja from './pages/Caja'; // <-- Importamos la nueva página
+import Historial from "./pages/Historial";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           {/* Nueva ruta de métricas */}
           <Route path="metrics" element={<Metrics />} />
           <Route path="caja" element={<Caja />} />
+          <Route path="historial" element={<Historial />} />
         </Route>
       </Routes>
     </BrowserRouter>

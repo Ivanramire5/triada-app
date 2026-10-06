@@ -1,65 +1,162 @@
-import { useState } from 'react';
-import { useInventoryStore } from '../store/useInventoryStore';
+import { useState, useEffect } from 'react';
 import '../style/Inventory.css';
 
 export default function Inventory() {
-  const products = useInventoryStore((state) => state.products);
-  const addProduct = useInventoryStore((state) => state.addProduct);
-  const deleteProduct = useInventoryStore((state) => state.deleteProduct);
-  const updateStock = useInventoryStore((state) => state.updateStock);
-  const editProduct = useInventoryStore((state) => state.editProduct);
-  const registerSale = useInventoryStore((state) => state.registerSale);
-    
+  // 1. Estados para los datos de la API
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
+
+  // Estados de la UI (se mantienen igual que los tuyos)
   const [searchTerm, setSearchTerm] = useState('');
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  
-  // CAMBIO: Iniciamos stock y price como strings vacíos ('') en lugar de 0
   const [newProduct, setNewProduct] = useState({ name: '', stock: '', category: '', price: '' });
-
   const [saleItem, setSaleItem] = useState(null);
   const [saleQuantity, setSaleQuantity] = useState(1);
 
+  // 2. Cargar productos desde C# al montar el componente
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:5168/api/productos');
+      if (!response.ok) throw new Error('Error al obtener inventario');
+      const data = await response.json();
+      setProducts(data);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  // 3. Filtrar productos
   const filteredProducts = products
     .filter((product) => {
       const term = searchTerm.toLowerCase();
-      return product.name.toLowerCase().includes(term) || product.category.toLowerCase().includes(term);
+      // Aseguramos que name y category existan antes de hacer toLowerCase
+      const name = product.nombre ? product.nombre.toLowerCase() : '';
+      const category = product.categoria ? product.categoria.toLowerCase() : '';
+      return name.includes(term) || category.includes(term);
     })
-    .sort((a, b) => a.category.localeCompare(b.category));
+    .sort((a, b) => (a.categoria || '').localeCompare(b.categoria || ''));
 
-  const handleSaveProduct = (e) => {
+  // 4. Guardar o Editar Producto en la base de datos
+  const handleSaveProduct = async (e) => {
     e.preventDefault();
     if (!newProduct.name || !newProduct.category) return;
-    
-    if (editingId) {
-      editProduct(editingId, {
-        name: newProduct.name,
-        stock: Number(newProduct.stock),
-        category: newProduct.category,
-        price: Number(newProduct.price)
-      });
-    } else {
-      addProduct({
-        name: newProduct.name,
-        stock: Number(newProduct.stock),
-        category: newProduct.category,
-        price: Number(newProduct.price)
-      });
+
+    // Formateamos el objeto para que coincida con las propiedades en C#
+    const productoAEnviar = {
+      nombre: newProduct.name,
+      categoria: newProduct.category,
+      stockActual: Number(newProduct.stock),
+      precioVenta: Number(newProduct.price),
+      
+      costo: 0,           
+      stockMinimo: 0,     
+      tenantId: 1         // El ID exacto de tu negocio creado
+    };
+
+    try {
+      if (editingId) {
+        // Petición PUT para editar
+        productoAEnviar.id = editingId;
+        await fetch(`http://localhost:5168/api/productos/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productoAEnviar)
+        });
+      } else {
+        // Petición POST para crear
+        const response = await fetch('http://localhost:5168/api/productos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productoAEnviar)
+        });
+        if (!response.ok) {
+          const errorData = await response.text(); 
+          console.error("Detalle del rechazo de C#:", errorData);
+          return;
+        }
+      }
+      
+      fetchProducts(); // Recargamos la tabla tras guardar
+      closeModal();
+    } catch (err) {
+      console.error("Error al guardar producto:", err);
     }
-    closeModal();
   };
 
+  // 5. Eliminar Producto
+  const deleteProduct = async (id) => {
+    if(!window.confirm("¿Seguro que deseas eliminar este producto?")) return;
+    
+    try {
+      await fetch(`http://localhost:5168/api/productos/${id}`, { method: 'DELETE' });
+      fetchProducts(); // Recargamos la tabla
+    } catch (err) {
+      console.error("Error al eliminar:", err);
+    }
+  };
+
+  // 6. Actualizar stock rápido (+ / -)
+  const updateStock = async (product, amount) => {
+    const nuevoStock = product.stockActual + amount;
+    if (nuevoStock < 0) return;
+
+    const productoActualizado = { ...product, stockActual: nuevoStock };
+
+    try {
+      await fetch(`http://localhost:5168/api/productos/${product.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productoActualizado)
+      });
+      fetchProducts();
+    } catch (err) {
+      console.error("Error al actualizar stock:", err);
+    }
+  };
+
+  // 7. Confirmar Venta
+  const handleConfirmPurchase = async () => {
+    if (saleItem && saleQuantity > 0 && saleQuantity <= saleItem.stockActual) {
+      const nuevoStock = saleItem.stockActual - saleQuantity;
+      const productoActualizado = { ...saleItem, stockActual: nuevoStock };
+
+      try {
+        // Actualizamos el stock en la base de datos
+        await fetch(`http://localhost:5168/api/productos/${saleItem.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productoActualizado)
+        });
+        
+        // Aquí a futuro harás un POST a /api/ventas para registrar el historial
+        fetchProducts();
+        setSaleItem(null); 
+      } catch (err) {
+        console.error("Error al registrar venta:", err);
+      }
+    }
+  };
+
+  // --- MÉTODOS DE LA UI ---
   const handleEditClick = (product) => {
     setEditingId(product.id);
-    setNewProduct({ name: product.name, stock: product.stock, category: product.category, price: product.price });
+    setNewProduct({ 
+      name: product.nombre, 
+      stock: product.stockActual, 
+      category: product.categoria, 
+      price: product.precioVenta 
+    });
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    // CAMBIO: Al cerrar, volvemos a dejar los campos vacíos
     setNewProduct({ name: '', stock: '', category: '', price: '' });
   };
 
@@ -68,17 +165,10 @@ export default function Inventory() {
     setSaleQuantity(1);
   };
 
-  const handleConfirmPurchase = () => {
-    if (saleItem && saleQuantity > 0 && saleQuantity <= saleItem.stock) {
-      registerSale(saleItem.id, saleQuantity);
-      setSaleItem(null); 
-    }
-  };
-
   return (
     <div className="inventory-container">
+      {error && <div style={{color: 'red', marginBottom: '10px'}}>Error: {error}</div>}
 
-      
       <div className="toolbar">
         <input 
           type="text" 
@@ -90,7 +180,7 @@ export default function Inventory() {
         <button onClick={() => { closeModal(); setIsModalOpen(true); }} className="btn-add">
           <i className="bi bi-plus-circle"></i> Agregar Producto
         </button>
-    </div>
+      </div>
 
       <table className="inventory-table">
         <thead>
@@ -99,19 +189,19 @@ export default function Inventory() {
             <th className="table-text">Producto</th>
             <th className="table-text">Stock</th>
             <th className="table-text">Precio</th>
-            <th className="table-text"></th> {/* Esta celda queda vacía y sin la clase table-text */}
+            <th className="table-text"></th> 
           </tr>
         </thead>
         <tbody>
           {filteredProducts.map((product) => (
             <tr key={product.id}>
-              <td><strong>{product.category}</strong></td>
-              <td>{product.name}</td>
-              <td>{product.stock}</td>
-              <td>${product.price}</td>
+              <td><strong>{product.categoria}</strong></td>
+              <td>{product.nombre}</td>
+              <td>{product.stockActual}</td>
+              <td>${product.precioVenta}</td>
               <td className="actions-cell">
-                <button className="btn-icon" onClick={() => updateStock(product.id, -1)}>-</button>
-                <button className="btn-icon" onClick={() => updateStock(product.id, 1)}>+</button>
+                <button className="btn-icon" onClick={() => updateStock(product, -1)}>-</button>
+                <button className="btn-icon" onClick={() => updateStock(product, 1)}>+</button>
                 
                 <button className="btn-sell" onClick={() => handleOpenSaleModal(product)}>
                   💲 Vender
@@ -125,7 +215,7 @@ export default function Inventory() {
         </tbody>
       </table>
 
-      {/* CARTELITO POP-UP DE AGREGAR / EDITAR */}
+      {/* POP-UP DE AGREGAR / EDITAR */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
@@ -135,8 +225,6 @@ export default function Inventory() {
                 value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} />
               <input type="text" placeholder="Categoría" required className="input-field"
                 value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value})} />
-              
-              {/* Ahora estos campos mostrarán su placeholder correctamente */}
               <input type="number" placeholder="Stock" required className="input-field"
                 value={newProduct.stock} onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})} />
               <input type="number" placeholder="Precio ($)" required className="input-field"
@@ -156,8 +244,8 @@ export default function Inventory() {
         <div className="modal-overlay">
           <div className="modal-content sale-modal">
             <h3>Confirmar Venta</h3>
-            <p>Producto: <strong>{saleItem.name}</strong></p>
-            <p>Stock disponible: {saleItem.stock}</p>
+            <p>Producto: <strong>{saleItem.nombre}</strong></p>
+            <p>Stock disponible: {saleItem.stockActual}</p>
             
             <div className="quantity-selector">
               <label>Cantidad a vender:</label>
@@ -170,7 +258,7 @@ export default function Inventory() {
               <button 
                 type="button"
                 className="btn-icon" 
-                onClick={() => setSaleQuantity(Math.min(saleItem.stock, saleQuantity + 1))}
+                onClick={() => setSaleQuantity(Math.min(saleItem.stockActual, saleQuantity + 1))}
               >+</button>
             </div>
 

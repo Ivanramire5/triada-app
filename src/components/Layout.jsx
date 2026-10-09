@@ -17,12 +17,10 @@ export default function Layout() {
                         <i className="bi bi-bag-fill"></i>
                         Inventario
                     </Link>
-                    
                     <Link to="/metrics" className="nav-link">
                         <i className="bi bi-database-fill"></i>
                         Métricas
                     </Link>
-
                     {/* NUEVO ACCESO: Basado en las ideas de tu captura */}
                     <Link to="/caja" className="nav-link">
                         <i className="bi bi-cash-coin"></i>
@@ -31,6 +29,10 @@ export default function Layout() {
                     <Link to="/historial" className="nav-link">
                         <i className="bi bi-clock-history"></i>
                         Historial
+                    </Link>
+                    <Link to="/resumen-diario" className="nav-link">
+                        <i className="bi bi-calendar3"></i>
+                        Resumen Diario
                     </Link>
                 </nav>
             </aside>

@@ -1,11 +1,39 @@
-import { useInventoryStore } from '../store/useInventoryStore';
+import { useState, useEffect } from 'react';
 import "../style/Historial.css";
 import Swal from 'sweetalert2';
 
 export default function Historial() {
-    const salesHistory = useInventoryStore((state) => state.salesHistory || []);
-    const clearHistory = useInventoryStore((state) => state.clearHistory);
-    const deleteHistoryItem = useInventoryStore((state) => state.deleteHistoryItem);
+    const [salesHistory, setSalesHistory] = useState([]);
+
+    // Cargar el historial desde el backend
+    const fetchHistory = async () => {
+        try {
+            const response = await fetch('http://localhost:5168/api/transacciones/movimientos');
+            if (response.ok) {
+                const movimientos = await response.json();
+                
+                // Filtramos solo las "Salidas" (ventas) y formateamos los datos para la UI
+                const ventasFormateadas = movimientos
+                    .filter(m => m.tipo === "Salida")
+                    .map(v => ({
+                        id: v.id,
+                        date: v.fecha,
+                        productName: v.producto.nombre,
+                        quantity: v.cantidad,
+                        // Calculamos el total de esa venta específica
+                        total: v.cantidad * v.producto.precioVenta 
+                    }));
+                
+                setSalesHistory(ventasFormateadas);
+            }
+        } catch (error) {
+            console.error("Error al cargar historial:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchHistory();
+    }, []);
 
     // Agrupamos las ventas por día
     const groupedSales = salesHistory.reduce((acc, sale) => {
@@ -22,26 +50,67 @@ export default function Historial() {
             text: "Se borrará TODO el historial y no podrás revertirlo.",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#C2410C", // Tu naranja
+            confirmButtonColor: "#C2410C", 
             cancelButtonColor: "#7A8B99",
             confirmButtonText: "Sí, borrar todo",
             cancelButtonText: "Cancelar"
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
-                clearHistory();
-                Swal.fire({
-                    title: "¡Borrado!",
-                    text: "Tu historial ha sido eliminado.",
-                    icon: "success",
-                    confirmButtonColor: "#3F7A5C" // Tu verde
-                });
+                try {
+                    await fetch('http://localhost:5168/api/transacciones/movimientos/limpiar', {
+                        method: 'DELETE'
+                    });
+                    
+                    fetchHistory(); // Recargamos la lista
+
+                    Swal.fire({
+                        title: "¡Borrado!",
+                        text: "Tu historial ha sido eliminado.",
+                        icon: "success",
+                        confirmButtonColor: "#3F7A5C"
+                    });
+                } catch (error) {
+                    console.error("Error al limpiar historial:", error);
+                }
+            }
+        });
+    };
+
+    // Borrar un ítem individual
+    const handleDeleteItem = async (id, productName) => {
+        Swal.fire({
+            title: "¿Eliminar registro?",
+            text: `Vas a borrar la venta de ${productName}.`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#EF4444",
+            cancelButtonColor: "#7A8B99",
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await fetch(`http://localhost:5168/api/transacciones/movimientos/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    fetchHistory(); // Recargamos la lista
+
+                    Swal.fire({
+                        title: "¡Eliminado!",
+                        icon: "success",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } catch (error) {
+                    console.error("Error al eliminar registro:", error);
+                }
             }
         });
     };
 
     return (
         <div className="caja-container">
-            {/* ENCABEZADO CON BOTÓN DE LIMPIAR GENERAL */}
             <div className="historial-header-main">
                 <h2 className="caja-title">Historial de Ventas</h2>
                 {salesHistory.length > 0 && (
@@ -60,8 +129,6 @@ export default function Historial() {
 
                     return (
                         <div key={date} className="history-card">
-                            
-                            {/* ENCABEZADO DE LA TARJETA (Franja verde con fecha) */}
                             <h3 className="history-date">
                                 <i className="bi bi-calendar-event"></i> {date}
                             </h3>
@@ -78,35 +145,12 @@ export default function Historial() {
                                             </span>
                                         </span>
                                         
-                                        {/* ACCIONES DE LA FILA (Precio + Botón de borrar individual) */}
                                         <div className="history-item-actions">
                                             <strong className="history-item-price">${sale.total.toLocaleString('es-AR')}</strong>
                                             <button 
                                                 className="btn-delete-item"
                                                 title="Borrar venta individual"
-                                                onClick={() => {
-                                                    Swal.fire({
-                                                        title: "¿Eliminar registro?",
-                                                        text: `Vas a borrar la venta de ${sale.productName}.`,
-                                                        icon: "warning",
-                                                        showCancelButton: true,
-                                                        confirmButtonColor: "#EF4444", // Rojo de alerta
-                                                        cancelButtonColor: "#7A8B99",
-                                                        confirmButtonText: "Sí, eliminar",
-                                                        cancelButtonText: "Cancelar"
-                                                    }).then((result) => {
-                                                        if (result.isConfirmed) {
-                                                            deleteHistoryItem(sale.id);
-                                                            // Una pequeña alerta de éxito que desaparece sola rápido
-                                                            Swal.fire({
-                                                                title: "¡Eliminado!",
-                                                                icon: "success",
-                                                                showConfirmButton: false,
-                                                                timer: 1500
-                                                            });
-                                                        }
-                                                    });
-                                                }}
+                                                onClick={() => handleDeleteItem(sale.id, sale.productName)}
                                             >
                                                 <i className="bi bi-x-circle-fill"></i>
                                             </button>
@@ -114,7 +158,6 @@ export default function Historial() {
                                     </li>
                                 ))}
                             </ul>
-                            {/* PIE DE LA TARJETA (Total del día) */}
                             <strong className="history-total">Total: ${totalDia.toLocaleString('es-AR')}</strong>
                         </div>
                     );

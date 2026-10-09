@@ -1,19 +1,62 @@
-import { useInventoryStore } from '../store/useInventoryStore';
+import { useState, useEffect } from 'react';
 import '../style/metrics.css';
 
 export default function Metrics() {
-    const products = useInventoryStore((state) => state.products);
+    const [metricsData, setMetricsData] = useState([]);
+    const [error, setError] = useState(null);
 
-    // CAMBIO: Quitamos el ".filter" para que incluya absolutamente todos los productos, 
-    // incluso los que tienen 0 ventas.
-    const allProductsSorted = [...products]
-        .sort((a, b) => (b.sales || 0) - (a.sales || 0));
+    useEffect(() => {
+        const fetchMetricsData = async () => {
+            try {
+                // Hacemos las dos peticiones al mismo tiempo para mayor velocidad
+                const [resProductos, resMovimientos] = await Promise.all([
+                    fetch('http://localhost:5168/api/productos'),
+                    fetch('http://localhost:5168/api/transacciones/movimientos')
+                ]);
+
+                if (!resProductos.ok || !resMovimientos.ok) {
+                    throw new Error('Error al obtener datos del servidor');
+                }
+
+                const productos = await resProductos.json();
+                const movimientos = await resMovimientos.json();
+
+                // Cruzamos los datos: por cada producto, sumamos cuántas unidades salieron en ventas
+                const productosConVentas = productos.map(prod => {
+                    const ventasDelProducto = movimientos.filter(
+                        m => m.productoId === prod.id && m.tipo === "Salida"
+                    );
+                    
+                    const totalVendido = ventasDelProducto.reduce((total, m) => total + m.cantidad, 0);
+
+                    return {
+                        id: prod.id,
+                        name: prod.nombre,       // Adaptamos el nombre de C# al que usaba tu UI
+                        category: prod.categoria,
+                        sales: totalVendido
+                    };
+                });
+
+                // Ordenamos de mayor a menor según las ventas
+                const dataOrdenada = productosConVentas.sort((a, b) => b.sales - a.sales);
+                setMetricsData(dataOrdenada);
+
+            } catch (err) {
+                setError(err.message);
+                console.error(err);
+            }
+        };
+
+        fetchMetricsData();
+    }, []);
 
     return (
         <div className="metrics-container">
             <h2 className='metrics-title'>Métricas del Local</h2>
             <hr className="metrics-divider" />
             
+            {error && <p style={{ color: 'red', textAlign: 'center' }}>Error: {error}</p>}
+
             <div className="metrics-card">
                 <div className="metrics-header">
                     <h3 className="metrics-subtitle">
@@ -21,9 +64,9 @@ export default function Metrics() {
                     </h3>
                 </div>
                 <ul className="metrics-list">
-                {allProductsSorted.length > 0 ? (
-                    allProductsSorted.map((product, index) => {
-                        const isTop3 = index < 3 && (product.sales || 0) > 0; // Solo da medalla si está en el top 3 Y vendió algo
+                {metricsData.length > 0 ? (
+                    metricsData.map((product, index) => {
+                        const isTop3 = index < 3 && product.sales > 0; // Solo da medalla si está en el top 3 Y vendió algo
                         const medals = ['🥇', '🥈', '🥉'];
                         
                         return (
@@ -40,7 +83,7 @@ export default function Metrics() {
                                     <strong style={{ fontSize: isTop3 ? '18px' : 'inherit', marginRight: '6px' }}>
                                         {isTop3 ? medals[index] : `#${index + 1}`}
                                     </strong> 
-                                    <span style={{ fontWeight: isTop3 ? '700' : 'normal', color: (product.sales || 0) === 0 ? '#7A8B99' : 'inherit' }}>
+                                    <span style={{ fontWeight: isTop3 ? '700' : 'normal', color: product.sales === 0 ? '#7A8B99' : 'inherit' }}>
                                         {product.name}
                                     </span> 
                                     <span className="metrics-category"> ({product.category})</span>
@@ -50,7 +93,7 @@ export default function Metrics() {
                                     className="metrics-sales-badge"
                                     style={isTop3 ? { backgroundColor: '#C2410C', color: '#FAF3EE' } : {}}
                                 >
-                                    {product.sales || 0} vendidos
+                                    {product.sales} vendidos
                                 </span>
                             </li>
                         );

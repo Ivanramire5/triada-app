@@ -6,7 +6,7 @@ export default function Inventory() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
 
-  // Estados de la UI (se mantienen igual que los tuyos)
+  // Estados de la UI
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -14,10 +14,17 @@ export default function Inventory() {
   const [saleItem, setSaleItem] = useState(null);
   const [saleQuantity, setSaleQuantity] = useState(1);
 
-  // 2. Cargar productos desde C# al montar el componente
+  // 2. Función para obtener productos desde la API
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:5168/api/productos');
+      const token = localStorage.getItem('token'); // Recuperamos el token
+
+      const response = await fetch('http://localhost:5168/api/productos', {
+        headers: {
+          'Authorization': `Bearer ${token}` // Inyectado
+        }
+      });
+
       if (!response.ok) throw new Error('Error al obtener inventario');
       const data = await response.json();
       setProducts(data);
@@ -34,7 +41,6 @@ export default function Inventory() {
   const filteredProducts = products
     .filter((product) => {
       const term = searchTerm.toLowerCase();
-      // Aseguramos que name y category existan antes de hacer toLowerCase
       const name = product.nombre ? product.nombre.toLowerCase() : '';
       const category = product.categoria ? product.categoria.toLowerCase() : '';
       return name.includes(term) || category.includes(term);
@@ -46,32 +52,38 @@ export default function Inventory() {
     e.preventDefault();
     if (!newProduct.name || !newProduct.category) return;
 
-    // Formateamos el objeto para que coincida con las propiedades en C#
     const productoAEnviar = {
       nombre: newProduct.name,
       categoria: newProduct.category,
       stockActual: Number(newProduct.stock),
       precioVenta: Number(newProduct.price),
-      
-      costo: 0,           
-      stockMinimo: 0,     
-      tenantId: 1         // El ID exacto de tu negocio creado
+      costo: 0,          
+      stockMinimo: 0,    
+      tenantId: 1        
     };
 
     try {
+      const token = localStorage.getItem('token'); // Recuperamos el token
+
       if (editingId) {
         // Petición PUT para editar
         productoAEnviar.id = editingId;
         await fetch(`http://localhost:5168/api/productos/${editingId}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Inyectado
+          },
           body: JSON.stringify(productoAEnviar)
         });
       } else {
         // Petición POST para crear
         const response = await fetch('http://localhost:5168/api/productos', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Inyectado
+          },
           body: JSON.stringify(productoAEnviar)
         });
         if (!response.ok) {
@@ -81,7 +93,7 @@ export default function Inventory() {
         }
       }
       
-      fetchProducts(); // Recargamos la tabla tras guardar
+      fetchProducts(); 
       closeModal();
     } catch (err) {
       console.error("Error al guardar producto:", err);
@@ -93,8 +105,15 @@ export default function Inventory() {
     if(!window.confirm("¿Seguro que deseas eliminar este producto?")) return;
     
     try {
-      await fetch(`http://localhost:5168/api/productos/${id}`, { method: 'DELETE' });
-      fetchProducts(); // Recargamos la tabla
+      const token = localStorage.getItem('token'); // Recuperamos el token
+
+      await fetch(`http://localhost:5168/api/productos/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}` // Inyectado
+        }
+      });
+      fetchProducts(); 
     } catch (err) {
       console.error("Error al eliminar:", err);
     }
@@ -108,9 +127,14 @@ export default function Inventory() {
     const productoActualizado = { ...product, stockActual: nuevoStock };
 
     try {
+      const token = localStorage.getItem('token'); // Recuperamos el token
+
       await fetch(`http://localhost:5168/api/productos/${product.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Inyectado
+        },
         body: JSON.stringify(productoActualizado)
       });
       fetchProducts();
@@ -124,16 +148,40 @@ export default function Inventory() {
     if (saleItem && saleQuantity > 0 && saleQuantity <= saleItem.stockActual) {
       const nuevoStock = saleItem.stockActual - saleQuantity;
       const productoActualizado = { ...saleItem, stockActual: nuevoStock };
+      const totalVenta = saleItem.precioVenta * saleQuantity;
 
       try {
-        // Actualizamos el stock en la base de datos
+        const token = localStorage.getItem('token'); // Recuperamos el token
+
+        // 1. Descontamos el stock
         await fetch(`http://localhost:5168/api/productos/${saleItem.id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Inyectado
+          },
           body: JSON.stringify(productoActualizado)
         });
         
-        // Aquí a futuro harás un POST a /api/ventas para registrar el historial
+        // 2. Registramos el movimiento
+        const registroVenta = {
+          productoId: saleItem.id,
+          cantidad: saleQuantity,
+          totalCobrado: totalVenta,
+          tipoOperacion: 'Venta',
+          fecha: new Date().toISOString(),
+          tenantId: 1 
+        };
+
+        await fetch('http://localhost:5168/api/transacciones', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Inyectado
+          },
+          body: JSON.stringify(registroVenta)
+        });
+
         fetchProducts();
         setSaleItem(null); 
       } catch (err) {

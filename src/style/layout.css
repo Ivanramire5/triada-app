@@ -26,21 +26,35 @@
 .nav-link:hover {
     color: #3F7A5C; /* Color azul de Bootstrap o el que uses en tu Figma */
 }
-.app-title{
-    color: #FAF3EE;
+.topbar {
     background-color: #0B4F6C;
-    padding-top: 20px;
-    text-align: left;
-    padding-left: 30px;
-    padding-bottom: 10px;
+    display: flex; 
+    justify-content: space-between; /* Título a la izq, botón a la der */
+    align-items: center; /* Centrado vertical */
+    padding: 15px 30px; /* Espacio interno general de la barra */
+    margin: 0; 
+}
+
+.app-title {
+    color: #FAF3EE;
+    margin: 0; /* Quitamos todo el padding y background sobrante */
 }
 .topbar-title{
     background-color: #0B4F6C;
     color: #FAF3EE;
     text-align: center;
 }
-.topbar{
-    background-color: #0B4F6C;
-    margin-bottom: -8px;
-    margin-top: -8px;
+
+.logout-button{
+    background-color: #3F7A5C;
+    color: #FAF3EE;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s, color 0.2s;
+    
+    /* --- NUEVO --- */
+    border-radius: 6px; /* 1. Hace que los bordes sean redondeados */
+    margin-left: auto;  /* 2. Lo empuja automáticamente al extremo derecho */
 }

@@ -7,6 +7,7 @@ import Caja from './pages/Caja'; // <-- Importamos la nueva página
 import Historial from "./pages/Historial";
 import ResumenDiario from './pages/ResumenDiario'; // <-- Importamos la nueva página
 import Login from "./components/Login"; // <-- Importamos el login
+import Proveedores from './pages/Proveedores'; // <-- Importamos la nueva página de proveedores
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -20,8 +21,8 @@ function App() {
   }, []);
 
   const handleLogout = () => {
-      localStorage.removeItem('token');
-      setIsAuthenticated(false);
+    localStorage.removeItem('token');
+    window.location.href = '/login';
   };
 
   // SI NO ESTÁ AUTENTICADO: Mostramos exclusivamente la pantalla de Login
@@ -29,6 +30,7 @@ function App() {
       return <Login onLoginSuccess={() => setIsAuthenticated(true)} />;
   }
   return (
+    
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout onLogout={handleLogout} />}></Route>
@@ -39,7 +41,7 @@ function App() {
           <Route path="caja" element={<Caja />} />
           <Route path="historial" element={<Historial />} />
           <Route path="resumen-diario" element={<ResumenDiario />} />
-          
+          <Route path="proveedores" element={<Proveedores />} />
         </Route>
       </Routes>
     </BrowserRouter>

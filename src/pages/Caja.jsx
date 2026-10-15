@@ -122,27 +122,6 @@ export default function Caja() {
                     </button>
                 </div>
             </div>
-
-            <div className="caja-chart-container">
-                <h3 className="chart-title">Ingresos por Producto</h3>
-                
-                <div className="chart-wrapper" style={{ width: '100%', overflowX: 'auto', marginTop: '20px' }}>
-                    <div style={{ 
-                        minWidth: chartData.length > 6 ? `${chartData.length * 80}px` : '100%', 
-                        height: '300px' 
-                    }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" opacity={0.5} />
-                                <XAxis dataKey="nombre" stroke="#7A8B99" fontSize={12} />
-                                <YAxis stroke="#7A8B99" fontSize={12} />
-                                <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} formatter={(value) => `$${value}`} />
-                                <Bar dataKey="ingresos" fill="#3F7A5C" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 }

@@ -4,25 +4,39 @@ import '../style/Inventory.css';
 export default function Inventory() {
   // 1. Estados para los datos de la API
   const [products, setProducts] = useState([]);
+  const [proveedores, setProveedores] = useState([]);
   const [error, setError] = useState(null);
 
-  // Estados de la UI
+  // 2. Estados de la UI
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [newProduct, setNewProduct] = useState({ name: '', stock: '', category: '', price: '' });
+  // Agregamos proveedorId al estado inicial
+  const [newProduct, setNewProduct] = useState({ name: '', stock: '', category: '', price: '', proveedorId: '' });
   const [saleItem, setSaleItem] = useState(null);
   const [saleQuantity, setSaleQuantity] = useState(1);
 
-  // 2. Función para obtener productos desde la API
+  // 3. Funciones para obtener datos desde la API
+  const fetchProveedores = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5168/api/proveedores', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProveedores(data);
+      }
+    } catch (error) {
+      console.error("Error cargando proveedores:", error);
+    }
+  };
+
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem('token'); // Recuperamos el token
-
+      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5168/api/productos', {
-        headers: {
-          'Authorization': `Bearer ${token}` // Inyectado
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
 
       if (!response.ok) throw new Error('Error al obtener inventario');
@@ -33,11 +47,13 @@ export default function Inventory() {
     }
   };
 
+  // Cargar productos y proveedores al entrar a la pantalla
   useEffect(() => {
     fetchProducts();
+    fetchProveedores();
   }, []);
 
-  // 3. Filtrar productos
+  // 4. Filtrar productos
   const filteredProducts = products
     .filter((product) => {
       const term = searchTerm.toLowerCase();
@@ -47,11 +63,12 @@ export default function Inventory() {
     })
     .sort((a, b) => (a.categoria || '').localeCompare(b.categoria || ''));
 
-  // 4. Guardar o Editar Producto en la base de datos
+  // 5. Guardar o Editar Producto en la base de datos
   const handleSaveProduct = async (e) => {
     e.preventDefault();
     if (!newProduct.name || !newProduct.category) return;
 
+    // Preparamos el objeto a enviar, incluyendo el proveedor si fue seleccionado
     const productoAEnviar = {
       nombre: newProduct.name,
       categoria: newProduct.category,
@@ -59,30 +76,29 @@ export default function Inventory() {
       precioVenta: Number(newProduct.price),
       costo: 0,          
       stockMinimo: 0,    
-      tenantId: 1        
+      tenantId: 1,
+      proveedorId: newProduct.proveedorId ? Number(newProduct.proveedorId) : null 
     };
 
     try {
-      const token = localStorage.getItem('token'); // Recuperamos el token
+      const token = localStorage.getItem('token');
 
       if (editingId) {
-        // Petición PUT para editar
         productoAEnviar.id = editingId;
         await fetch(`http://localhost:5168/api/productos/${editingId}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Inyectado
+            'Authorization': `Bearer ${token}` 
           },
           body: JSON.stringify(productoAEnviar)
         });
       } else {
-        // Petición POST para crear
         const response = await fetch('http://localhost:5168/api/productos', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Inyectado
+            'Authorization': `Bearer ${token}` 
           },
           body: JSON.stringify(productoAEnviar)
         });
@@ -100,18 +116,15 @@ export default function Inventory() {
     }
   };
 
-  // 5. Eliminar Producto
+  // 6. Eliminar Producto
   const deleteProduct = async (id) => {
     if(!window.confirm("¿Seguro que deseas eliminar este producto?")) return;
     
     try {
-      const token = localStorage.getItem('token'); // Recuperamos el token
-
+      const token = localStorage.getItem('token');
       await fetch(`http://localhost:5168/api/productos/${id}`, { 
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}` // Inyectado
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       fetchProducts(); 
     } catch (err) {
@@ -119,7 +132,7 @@ export default function Inventory() {
     }
   };
 
-  // 6. Actualizar stock rápido (+ / -)
+  // 7. Actualizar stock rápido (+ / -)
   const updateStock = async (product, amount) => {
     const nuevoStock = product.stockActual + amount;
     if (nuevoStock < 0) return;
@@ -127,13 +140,12 @@ export default function Inventory() {
     const productoActualizado = { ...product, stockActual: nuevoStock };
 
     try {
-      const token = localStorage.getItem('token'); // Recuperamos el token
-
+      const token = localStorage.getItem('token');
       await fetch(`http://localhost:5168/api/productos/${product.id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Inyectado
+          'Authorization': `Bearer ${token}` 
         },
         body: JSON.stringify(productoActualizado)
       });
@@ -143,7 +155,7 @@ export default function Inventory() {
     }
   };
 
-  // 7. Confirmar Venta
+  // 8. Confirmar Venta
   const handleConfirmPurchase = async () => {
     if (saleItem && saleQuantity > 0 && saleQuantity <= saleItem.stockActual) {
       const nuevoStock = saleItem.stockActual - saleQuantity;
@@ -151,19 +163,17 @@ export default function Inventory() {
       const totalVenta = saleItem.precioVenta * saleQuantity;
 
       try {
-        const token = localStorage.getItem('token'); // Recuperamos el token
+        const token = localStorage.getItem('token');
 
-        // 1. Descontamos el stock
         await fetch(`http://localhost:5168/api/productos/${saleItem.id}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Inyectado
+            'Authorization': `Bearer ${token}` 
           },
           body: JSON.stringify(productoActualizado)
         });
         
-        // 2. Registramos el movimiento
         const registroVenta = {
           productoId: saleItem.id,
           cantidad: saleQuantity,
@@ -177,7 +187,7 @@ export default function Inventory() {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // Inyectado
+            'Authorization': `Bearer ${token}` 
           },
           body: JSON.stringify(registroVenta)
         });
@@ -197,7 +207,8 @@ export default function Inventory() {
       name: product.nombre, 
       stock: product.stockActual, 
       category: product.categoria, 
-      price: product.precioVenta 
+      price: product.precioVenta,
+      proveedorId: product.proveedorId || '' // Cargamos el proveedor si ya tenía uno
     });
     setIsModalOpen(true);
   };
@@ -205,7 +216,7 @@ export default function Inventory() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    setNewProduct({ name: '', stock: '', category: '', price: '' });
+    setNewProduct({ name: '', stock: '', category: '', price: '', proveedorId: '' });
   };
 
   const handleOpenSaleModal = (product) => {
@@ -271,12 +282,30 @@ export default function Inventory() {
             <form onSubmit={handleSaveProduct} className="product-form">
               <input type="text" placeholder="Nombre" required className="input-field"
                 value={newProduct.name} onChange={(e) => setNewProduct({...newProduct, name: e.target.value})} />
+              
               <input type="text" placeholder="Categoría" required className="input-field"
                 value={newProduct.category} onChange={(e) => setNewProduct({...newProduct, category: e.target.value})} />
+              
               <input type="number" placeholder="Stock" required className="input-field"
                 value={newProduct.stock} onChange={(e) => setNewProduct({...newProduct, stock: e.target.value})} />
+              
               <input type="number" placeholder="Precio ($)" required className="input-field"
                 value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} />
+              
+              {/* SELECTOR DE PROVEEDORES (Ahora integrado en el formulario) */}
+              <select 
+                value={newProduct.proveedorId} 
+                onChange={(e) => setNewProduct({ ...newProduct, proveedorId: e.target.value })}
+                className="input-field"
+                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+              >
+                <option value="">-- Seleccionar Proveedor (Opcional) --</option>
+                {proveedores.map(prov => (
+                  <option key={prov.id} value={prov.id}>
+                    {prov.nombre} - {prov.empresa}
+                  </option>
+                ))}
+              </select>
               
               <div className="modal-actions">
                 <button type="button" className="btn-cancel" onClick={closeModal}>Cancelar</button>

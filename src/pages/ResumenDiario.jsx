@@ -5,19 +5,30 @@ export default function ResumenDiario() {
     const [resumen, setResumen] = useState([]);
 
     useEffect(() => {
-        const fetchResumen = async () => {
-            try {
-                const response = await fetch('http://localhost:5168/api/transacciones/resumen-diario');
-                if (response.ok) {
-                    const data = await response.json();
-                    setResumen(data);
-                }
-            } catch (error) {
-                console.error("Error al cargar el resumen diario:", error);
-            }
-        };
+    const fetchResumen = async () => {
+        try {
+            // 1. Obtenemos el token de la memoria
+            const token = localStorage.getItem('token');
 
-        fetchResumen();
+            // 2. Hacemos la petición adjuntando la llave de seguridad
+            const response = await fetch('http://localhost:5168/api/transacciones/resumen-diario', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // Aquí va el token
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                setResumen(data);
+            }
+        } catch (error) {
+            console.error("Error al cargar el resumen diario:", error);
+        }
+    };
+
+    fetchResumen();
     }, []);
 
     return (

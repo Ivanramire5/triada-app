@@ -8,38 +8,50 @@ export default function Metrics() {
     useEffect(() => {
         const fetchMetricsData = async () => {
             try {
-                // Hacemos las dos peticiones al mismo tiempo para mayor velocidad
-                const [resProductos, resMovimientos] = await Promise.all([
-                    fetch('http://localhost:5168/api/productos'),
-                    fetch('http://localhost:5168/api/transacciones/movimientos')
-                ]);
+        // 1. Obtenemos el token de la memoria
+        const token = localStorage.getItem('token');
 
-                if (!resProductos.ok || !resMovimientos.ok) {
-                    throw new Error('Error al obtener datos del servidor');
-                }
+        // 2. Configuramos la seguridad de la petición
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Aquí va la llave VIP
+            }
+        };
 
-                const productos = await resProductos.json();
-                const movimientos = await resMovimientos.json();
+        // 3. Hacemos las dos peticiones pasando las opciones de seguridad
+        const [resProductos, resMovimientos] = await Promise.all([
+            fetch('http://localhost:5168/api/productos', requestOptions),
+            fetch('http://localhost:5168/api/transacciones/movimientos', requestOptions)
+        ]);
 
-                // Cruzamos los datos: por cada producto, sumamos cuántas unidades salieron en ventas
-                const productosConVentas = productos.map(prod => {
-                    const ventasDelProducto = movimientos.filter(
-                        m => m.productoId === prod.id && m.tipo === "Salida"
-                    );
-                    
-                    const totalVendido = ventasDelProducto.reduce((total, m) => total + m.cantidad, 0);
+        if (!resProductos.ok || !resMovimientos.ok) {
+            throw new Error('Error al obtener datos del servidor');
+        }
 
-                    return {
-                        id: prod.id,
-                        name: prod.nombre,       // Adaptamos el nombre de C# al que usaba tu UI
-                        category: prod.categoria,
-                        sales: totalVendido
-                    };
-                });
+        const productos = await resProductos.json();
+        const movimientos = await resMovimientos.json();
 
-                // Ordenamos de mayor a menor según las ventas
-                const dataOrdenada = productosConVentas.sort((a, b) => b.sales - a.sales);
-                setMetricsData(dataOrdenada);
+        // Cruzamos los datos: por cada producto, sumamos cuántas unidades salieron en ventas
+        const productosConVentas = productos.map(prod => {
+            const ventasDelProducto = movimientos.filter(
+                m => m.productoId === prod.id && m.tipo === "Salida"
+            );
+            
+            const totalVendido = ventasDelProducto.reduce((total, m) => total + m.cantidad, 0);
+
+            return {
+                id: prod.id,
+                name: prod.nombre,       // Adaptamos el nombre de C# al que usaba tu UI
+                category: prod.categoria,
+                sales: totalVendido
+            };
+        });
+
+        // Ordenamos de mayor a menor según las ventas
+        const dataOrdenada = productosConVentas.sort((a, b) => b.sales - a.sales);
+        setMetricsData(dataOrdenada);
 
             } catch (err) {
                 setError(err.message);

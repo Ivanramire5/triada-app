@@ -2,9 +2,14 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 
 export default function Login({ onLoginSuccess }) {
+
+    
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,11 +27,17 @@ export default function Login({ onLoginSuccess }) {
             if (response.ok) {
                 const data = await response.json();
                 
-                // 1. Guardamos la "pulsera VIP" en el almacenamiento del navegador
+                // 1. Guardamos el token
                 localStorage.setItem('token', data.token);
+                
+                // --- NUEVO: Guardamos el nombre o correo del usuario ---
+                // (Por ahora usamos el email que ingresó en el formulario)
+                localStorage.setItem('userName', email); 
                 
                 // 2. Le avisamos a App.jsx que ya podemos entrar
                 onLoginSuccess();
+
+                window.location.href = '/';
                 
                 Swal.fire({
                     title: '¡Bienvenido!',

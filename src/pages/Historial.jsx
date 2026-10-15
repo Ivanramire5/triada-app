@@ -7,29 +7,40 @@ export default function Historial() {
 
     // Cargar el historial desde el backend
     const fetchHistory = async () => {
-        try {
-            const response = await fetch('http://localhost:5168/api/transacciones/movimientos');
-            if (response.ok) {
-                const movimientos = await response.json();
-                
-                // Filtramos solo las "Salidas" (ventas) y formateamos los datos para la UI
-                const ventasFormateadas = movimientos
-                    .filter(m => m.tipo === "Salida")
-                    .map(v => ({
-                        id: v.id,
-                        date: v.fecha,
-                        productName: v.producto.nombre,
-                        quantity: v.cantidad,
-                        // Calculamos el total de esa venta específica
-                        total: v.cantidad * v.producto.precioVenta 
-                    }));
-                
-                setSalesHistory(ventasFormateadas);
+    try {
+        // 1. Obtenemos el token de la sesión
+        const token = localStorage.getItem('token');
+
+        // 2. Adjuntamos los headers con la autorización en la petición
+        const response = await fetch('http://localhost:5168/api/transacciones/movimientos', {
+            method: 'GET', // Aunque sea GET, debemos especificarlo para poder pasar los headers
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Aquí enviamos la llave
             }
-        } catch (error) {
-            console.error("Error al cargar historial:", error);
+        });
+
+        if (response.ok) {
+            const movimientos = await response.json();
+            
+            // Filtramos solo las "Salidas" (ventas) y formateamos los datos para la UI
+            const ventasFormateadas = movimientos
+                .filter(m => m.tipo === "Salida")
+                .map(v => ({
+                    id: v.id,
+                    date: v.fecha,
+                    productName: v.producto.nombre,
+                    quantity: v.cantidad,
+                    // Calculamos el total de esa venta específica
+                    total: v.cantidad * v.producto.precioVenta 
+                }));
+            
+            setSalesHistory(ventasFormateadas);
         }
-    };
+    } catch (error) {
+        console.error("Error al cargar historial:", error);
+    }
+};
 
     useEffect(() => {
         fetchHistory();

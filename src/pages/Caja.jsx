@@ -10,10 +10,20 @@ export default function Caja() {
 
     const fetchCajaData = async () => {
         try {
+            const token = localStorage.getItem('token');
+
+            // 2. Armamos la cabecera con la credencial de autorización
+            const requestOptions = {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                }
+            };
             // 1. EL CAMBIO CLAVE: Asegurarnos de usar la ruta /turno-actual
             const [resProductos, resMovimientos] = await Promise.all([
-                fetch('http://localhost:5168/api/productos'),
-                fetch('http://localhost:5168/api/transacciones/movimientos/turno-actual') 
+                fetch('http://localhost:5168/api/productos', requestOptions),
+                fetch('http://localhost:5168/api/transacciones/movimientos/turno-actual', requestOptions) 
             ]);
 
             if (!resProductos.ok || !resMovimientos.ok) {
@@ -66,9 +76,16 @@ export default function Caja() {
     const handleCerrarCaja = async () => {
         if(window.confirm('¿Estás seguro de Cerrar la Caja? Esto reiniciará las ventas a cero para el próximo turno.')) {
             try {
-                // Le avisamos a C# que guarde la marca de "Cierre"
+                // 1. Obtenemos el token de la memoria
+                const token = localStorage.getItem('token');
+
+                // 2. Le avisamos a C# que guarde la marca, enviando nuestra llave VIP
                 const response = await fetch('http://localhost:5168/api/transacciones/cerrar-turno', {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` // EL CAMBIO CLAVE
+                    }
                 });
 
                 if (response.ok) {

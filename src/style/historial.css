@@ -143,3 +143,52 @@
     box-sizing: border-box; 
     border-top: 2px solid #3F7A5C;
 }
+
+/* =========================================
+   MEDIA QUERY PARA CELULARES (Responsive)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Reducimos el margen general para ganar espacio en la pantalla pequeña */
+    .caja-container {
+        margin: 15px 10px;
+    }
+
+    /* Apilamos el título y el botón de Limpiar Historial en columnas */
+    .historial-header-main {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    /* Hacemos que el botón principal sea más fácil de tocar */
+    .btn-clear-history {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+    }
+
+    /* Ajustamos los paddings y tamaños de la tarjeta para que no quede apretada */
+    .history-date {
+        padding: 12px 15px;
+        font-size: 16px;
+    }
+
+    .history-item {
+        padding: 12px 10px;
+        /* Si el nombre del producto es muy largo, permitimos que baje de línea */
+        flex-wrap: wrap; 
+        gap: 10px;
+    }
+
+    /* Achicamos la columna de la hora para darle más espacio al nombre del producto */
+    .history-time {
+        width: 75px; 
+        font-size: 14px;
+    }
+
+    .history-total {
+        font-size: 18px;
+        padding: 12px 15px;
+        text-align: center; /* En móvil, suele quedar mejor centrado que a la derecha */
+    }
+}

@@ -1,8 +1,13 @@
-
-.caja-chart-container{
+/* =========================================
+   ESTILOS ORIGINALES (Escritorio / Computadora)
+   ========================================= */
+.caja-chart-container {
     margin: 30px;
-    
+    background-color: #FFF5E4;
+    margin-top: 40px;
+    color: #FAF3EE;
 }
+
 .btn-close-caja {
     display: flex;
     align-items: center;
@@ -20,11 +25,12 @@
     transition: all 0.2s ease;
     box-shadow: 0 4px 6px rgba(63, 122, 92, 0.2);
 }
-.caja-container{
+
+.caja-container {
     text-align: center;
 }
 
-.caja-title{
+.caja-title {
     font-size: 40px;
     font-weight: bold;
     margin-bottom: 10px;
@@ -32,21 +38,24 @@
     text-align: center;
     margin-top: 20px;
 }
-.summary-title{
+
+.summary-title {
     font-size: 30px;
     margin-bottom: 10px;
     color: #a3360a;
     text-align: center;
     margin-top: 20px;
 }
-.summary-amount{
+
+.summary-amount {
     font-size: 30px;
     margin-bottom: 10px;
     color: #a3360a;
     text-align: center;
     margin-top: 20px;
 }
-.summary-subtitle{
+
+.summary-subtitle {
     font-size: 26px;
     margin-bottom: 10px;
     color: #a3360a;
@@ -54,7 +63,8 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
-.action-title{
+
+.action-title {
     font-size: 34px;
     margin-bottom: 10px;
     color: #3F7A5C;
@@ -62,7 +72,8 @@
     margin-top: 30px;
     margin-bottom: 20px;
 }
-.action-text{
+
+.action-text {
     font-size: 18px;
     margin-bottom: 10px;
     color: #3F7A5C;
@@ -70,17 +81,58 @@
     margin-top: 20px;
     margin-bottom: 20px;
 }
-.caja-chart-container{
-    background-color: #FFF5E4;
-    margin-top: 40px;
-    color: #FAF3EE;
 
-}
-.chart-title{
+.chart-title {
     background-color: #3F7A5C;
     padding-top: 10px;
     padding-bottom: 10px;
     font-size: 26px;
     text-align: left;
     padding-left: 20px;
+}
+
+/* =========================================
+   MEDIA QUERY PARA CELULARES (Responsive)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Achicamos los márgenes gigantes para aprovechar el espacio del celular */
+    .caja-chart-container {
+        margin: 15px 10px;
+        margin-top: 20px;
+    }
+
+    /* Reducimos el tamaño de todos los títulos para que entren bien en la pantalla */
+    .caja-title {
+        font-size: 28px;
+    }
+
+    .summary-title, 
+    .summary-amount {
+        font-size: 22px;
+    }
+
+    .summary-subtitle {
+        font-size: 18px;
+    }
+
+    .action-title {
+        font-size: 24px;
+        margin-top: 15px;
+    }
+
+    .action-text {
+        font-size: 15px;
+    }
+
+    .chart-title {
+        font-size: 20px;
+        padding-left: 10px;
+    }
+
+    /* El botón un poco más amigable para tocar con el dedo (touch target) */
+    .btn-close-caja {
+        width: 90%;
+        padding: 14px 20px;
+        font-size: 16px;
+    }
 }

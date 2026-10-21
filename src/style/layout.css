@@ -26,6 +26,7 @@
 .nav-link:hover {
     color: #3F7A5C; /* Color azul de Bootstrap o el que uses en tu Figma */
 }
+
 .topbar {
     background-color: #0B4F6C;
     display: flex; 
@@ -39,13 +40,14 @@
     color: #FAF3EE;
     margin: 0; /* Quitamos todo el padding y background sobrante */
 }
-.topbar-title{
+
+.topbar-title {
     background-color: #0B4F6C;
     color: #FAF3EE;
     text-align: center;
 }
 
-.logout-button{
+.logout-button {
     background-color: #3F7A5C;
     color: #FAF3EE;
     border: none;
@@ -57,4 +59,35 @@
     /* --- NUEVO --- */
     border-radius: 6px; /* 1. Hace que los bordes sean redondeados */
     margin-left: auto;  /* 2. Lo empuja automáticamente al extremo derecho */
+}
+
+/* =========================================
+   MEDIA QUERY PARA CELULARES (Responsive)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Barra de Navegación Naranja */
+    .sidebar-nav {
+        gap: 15px; /* Reducimos drásticamente la separación para que entren más opciones */
+        flex-wrap: wrap; /* Si los botones no entran en el ancho, pasan a la fila de abajo */
+        padding: 12px 10px;
+    }
+
+    .nav-link {
+        font-size: 14px; /* Achicamos la letra del menú */
+    }
+
+    /* Barra Superior Azul */
+    .topbar {
+        padding: 15px 15px; /* Achicamos el padding lateral para no desperdiciar pantalla */
+    }
+
+    .app-title {
+        font-size: 20px; /* Achicamos el título de la app */
+    }
+
+    /* Botón de Cerrar Sesión */
+    .logout-button {
+        padding: 6px 12px;
+        font-size: 13px; /* Botón un poco más compacto */
+    }
 }

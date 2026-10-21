@@ -11,7 +11,6 @@ export default function Inventory() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  // Agregamos proveedorId al estado inicial
   const [newProduct, setNewProduct] = useState({ name: '', stock: '', category: '', price: '', proveedorId: '' });
   const [saleItem, setSaleItem] = useState(null);
   const [saleQuantity, setSaleQuantity] = useState(1);
@@ -19,13 +18,15 @@ export default function Inventory() {
   // 3. Funciones para obtener datos desde la API
   const fetchProveedores = async () => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5168/api/proveedores', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: 'GET',
+        credentials: 'include' // <-- Envía la cookie automáticamente
       });
       if (response.ok) {
         const data = await response.json();
         setProveedores(data);
+      } else {
+        console.error("El servidor devolvió un error:", response.status);
       }
     } catch (error) {
       console.error("Error cargando proveedores:", error);
@@ -34,9 +35,9 @@ export default function Inventory() {
 
   const fetchProducts = async () => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5168/api/productos', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        method: 'GET',
+        credentials: 'include' // <-- Envía la cookie automáticamente
       });
 
       if (!response.ok) throw new Error('Error al obtener inventario');
@@ -68,7 +69,6 @@ export default function Inventory() {
     e.preventDefault();
     if (!newProduct.name || !newProduct.category) return;
 
-    // Preparamos el objeto a enviar, incluyendo el proveedor si fue seleccionado
     const productoAEnviar = {
       nombre: newProduct.name,
       categoria: newProduct.category,
@@ -81,24 +81,22 @@ export default function Inventory() {
     };
 
     try {
-      const token = localStorage.getItem('token');
-
       if (editingId) {
         productoAEnviar.id = editingId;
         await fetch(`http://localhost:5168/api/productos/${editingId}`, {
           method: 'PUT',
+          credentials: 'include', // <-- Envía la cookie automáticamente
           headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(productoAEnviar)
         });
       } else {
         const response = await fetch('http://localhost:5168/api/productos', {
           method: 'POST',
+          credentials: 'include', // <-- Envía la cookie automáticamente
           headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(productoAEnviar)
         });
@@ -121,10 +119,9 @@ export default function Inventory() {
     if(!window.confirm("¿Seguro que deseas eliminar este producto?")) return;
     
     try {
-      const token = localStorage.getItem('token');
       await fetch(`http://localhost:5168/api/productos/${id}`, { 
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        credentials: 'include' // <-- Envía la cookie automáticamente
       });
       fetchProducts(); 
     } catch (err) {
@@ -140,12 +137,11 @@ export default function Inventory() {
     const productoActualizado = { ...product, stockActual: nuevoStock };
 
     try {
-      const token = localStorage.getItem('token');
       await fetch(`http://localhost:5168/api/productos/${product.id}`, {
         method: 'PUT',
+        credentials: 'include', // <-- Envía la cookie automáticamente
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(productoActualizado)
       });
@@ -163,13 +159,11 @@ export default function Inventory() {
       const totalVenta = saleItem.precioVenta * saleQuantity;
 
       try {
-        const token = localStorage.getItem('token');
-
         await fetch(`http://localhost:5168/api/productos/${saleItem.id}`, {
           method: 'PUT',
+          credentials: 'include', // <-- Envía la cookie automáticamente
           headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(productoActualizado)
         });
@@ -185,9 +179,9 @@ export default function Inventory() {
 
         await fetch('http://localhost:5168/api/transacciones', {
           method: 'POST',
+          credentials: 'include', // <-- Envía la cookie automáticamente
           headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` 
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(registroVenta)
         });
@@ -208,7 +202,7 @@ export default function Inventory() {
       stock: product.stockActual, 
       category: product.categoria, 
       price: product.precioVenta,
-      proveedorId: product.proveedorId || '' // Cargamos el proveedor si ya tenía uno
+      proveedorId: product.proveedorId || '' 
     });
     setIsModalOpen(true);
   };
@@ -240,39 +234,41 @@ export default function Inventory() {
           <i className="bi bi-plus-circle"></i> Agregar Producto
         </button>
       </div>
-
-      <table className="inventory-table">
-        <thead>
-          <tr className="table-header">
-            <th className="table-text">Categoría</th>
-            <th className="table-text">Producto</th>
-            <th className="table-text">Stock</th>
-            <th className="table-text">Precio</th>
-            <th className="table-text"></th> 
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProducts.map((product) => (
-            <tr key={product.id}>
-              <td><strong>{product.categoria}</strong></td>
-              <td>{product.nombre}</td>
-              <td>{product.stockActual}</td>
-              <td>${product.precioVenta}</td>
-              <td className="actions-cell">
-                <button className="btn-icon" onClick={() => updateStock(product, -1)}>-</button>
-                <button className="btn-icon" onClick={() => updateStock(product, 1)}>+</button>
-                
-                <button className="btn-sell" onClick={() => handleOpenSaleModal(product)}>
-                  💲 Vender
-                </button>
-
-                <button className="btn-edit" onClick={() => handleEditClick(product)}>Editar</button>
-                <button className="btn-delete" onClick={() => deleteProduct(product.id)}>Eliminar</button>
-              </td>
+      <div className="table-responsive-wrapper">
+        <table className="inventory-table">
+          <thead>
+            <tr className="table-header">
+              <th className="table-text">Categoría</th>
+              <th className="table-text">Producto</th>
+              <th className="table-text">Stock</th>
+              <th className="table-text">Precio</th>
+              <th className="table-text"></th> 
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredProducts.map((product) => (
+              <tr key={product.id}>
+                <td><strong>{product.categoria}</strong></td>
+                <td>{product.nombre}</td>
+                <td>{product.stockActual}</td>
+                <td>${product.precioVenta}</td>
+                <td className="actions-cell">
+                  <button className="btn-icon" onClick={() => updateStock(product, -1)}>-</button>
+                  <button className="btn-icon" onClick={() => updateStock(product, 1)}>+</button>
+                  
+                  <button className="btn-sell" onClick={() => handleOpenSaleModal(product)}>
+                    💲 Vender
+                  </button>
+
+                  <button className="btn-edit" onClick={() => handleEditClick(product)}>Editar</button>
+                  <button className="btn-delete" onClick={() => deleteProduct(product.id)}>Eliminar</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      
 
       {/* POP-UP DE AGREGAR / EDITAR */}
       {isModalOpen && (
@@ -292,7 +288,7 @@ export default function Inventory() {
               <input type="number" placeholder="Precio ($)" required className="input-field"
                 value={newProduct.price} onChange={(e) => setNewProduct({...newProduct, price: e.target.value})} />
               
-              {/* SELECTOR DE PROVEEDORES (Ahora integrado en el formulario) */}
+              {/* SELECTOR DE PROVEEDORES */}
               <select 
                 value={newProduct.proveedorId} 
                 onChange={(e) => setNewProduct({ ...newProduct, proveedorId: e.target.value })}

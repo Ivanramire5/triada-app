@@ -1,0 +1,253 @@
+.landing-container {
+    font-family: sans-serif;
+    color: #2C3E50;
+    background-color: #FAF3EE;
+    min-height: 100vh;
+}
+
+.landing-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.landing-nav h1 {
+    color: #134B68;
+    margin: 0;
+    font-size: 24px;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-login {
+    background: transparent;
+    border: none;
+    color: #134B68;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-precios {
+    background-color: #134B68;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.landing-hero {
+    text-align: center;
+    padding: 80px 20px;
+    background-color: #134B68;
+    color: white;
+}
+
+.landing-hero h2 {
+    font-size: 3rem;
+    margin: 0 0 20px 0;
+}
+
+.landing-hero p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto 40px auto;
+    color: #D1E0E8;
+}
+
+.btn-comenzar {
+    background-color: #C2410C;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(194, 65, 12, 0.3);
+}
+
+.landing-section {
+    padding: 80px 50px;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 2rem;
+    color: #134B68;
+    margin-bottom: 50px;
+}
+
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.benefit-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    width: 300px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.benefit-card h4 {
+    color: #C2410C;
+    font-size: 1.5rem;
+}
+
+.pricing-section {
+    background-color: white;
+    padding: 80px 50px;
+    text-align: center;
+}
+
+.plan-card {
+    border: 1px solid #E2E8F0;
+    padding: 40px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: left;
+}
+
+.plan-card h4 {
+    font-size: 1.5rem;
+    color: #2C3E50;
+    margin: 0 0 10px 0;
+}
+
+.plan-price {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #134B68;
+    margin-bottom: 20px;
+}
+
+.plan-price span {
+    font-size: 1rem;
+    color: #7A8B99;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    line-height: 2;
+}
+
+.btn-plan {
+    width: 100%;
+    background-color: #134B68;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.plan-anual {
+    border: 2px solid #C2410C;
+    position: relative;
+    transform: scale(1.05);
+    background-color: #FFF5F0;
+}
+
+.badge-popular {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #C2410C;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.btn-plan-anual {
+    background-color: #C2410C;
+}
+
+.landing-footer {
+    background-color: #134B68;
+    color: #D1E0E8;
+    text-align: center;
+    padding: 20px;
+}
+
+.landing-footer p {
+    margin: 0;
+}
+
+/* =========================================
+   MEDIA QUERY PARA CELULARES (Responsive)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Barra de Navegación */
+    .landing-nav {
+        flex-direction: column;
+        padding: 15px 20px;
+        gap: 15px;
+    }
+
+    /* Hero Section */
+    .landing-hero {
+        padding: 50px 20px;
+    }
+
+    .landing-hero h2 {
+        font-size: 2rem; /* Achicamos el título principal */
+    }
+
+    .landing-hero p {
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+
+    .btn-comenzar {
+        width: 100%;
+        padding: 15px 20px;
+        box-sizing: border-box;
+    }
+
+    /* Secciones Generales */
+    .landing-section,
+    .pricing-section {
+        padding: 40px 20px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 30px;
+    }
+
+    /* Tarjetas (Beneficios y Precios) */
+    .cards-container {
+        gap: 20px;
+    }
+
+    .benefit-card,
+    .plan-card {
+        width: 100%; /* Las tarjetas ahora ocupan el 100% del ancho del celular */
+        box-sizing: border-box;
+        padding: 25px;
+    }
+
+    /* Ajuste específico para el plan anual destacado */
+    .plan-anual {
+        transform: scale(1); /* Quitamos el zoom para que no desborde hacia los costados en pantallas chicas */
+        margin-top: 15px; /* Le damos aire arriba por la etiqueta de Más Popular */
+    }
+}

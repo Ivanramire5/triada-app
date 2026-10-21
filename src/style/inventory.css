@@ -172,6 +172,16 @@
     font-size: 18px;
     font-weight: bold;
 }
+
+/* =========================================
+   Contenedor para Scroll de Tabla (Clave para Responsive)
+   ========================================= */
+.table-responsive-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Permite scroll horizontal si la tabla es más ancha que la pantalla */
+    border-radius: 8px;
+}
+
 /* =========================================
    Estilos de la Tabla de Inventario
    ========================================= */
@@ -183,6 +193,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra sutil para la tabla */
     border-radius: 8px;
     overflow: hidden;
+    min-width: 600px; /* Asegura que la tabla no se apriete demasiado en móviles, forzando el scroll */
 }
 
 .inventory-table thead {
@@ -221,6 +232,7 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: center;
 }
 
 /* Botones de + y - */
@@ -374,7 +386,62 @@ th.table-text {
 .btn-add i {
   font-size: 18px; /* Hacemos el ícono de suma un pelín más grande */
 }
-.inventory-container{
+.inventory-container {
     margin-left: 30px;
     margin-right: 30px;
+}
+
+/* =========================================
+   MEDIA QUERY PARA CELULARES (Responsive)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Quitamos los márgenes laterales gigantes del contenedor para ganar espacio */
+    .inventory-container {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    /* La barra de herramientas (Buscador + Botón Agregar) */
+    .toolbar {
+        margin-left: 0;
+        margin-right: 0;
+        flex-direction: column; /* Apila la barra arriba y el botón abajo */
+        width: 100%;
+        gap: 15px;
+    }
+
+    /* Hacemos que el input y el botón ocupen todo el ancho de la pantalla */
+    .search-input {
+        max-width: 100%;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-add {
+        margin-right: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Ajustamos el tamaño del pop-up (modal) para móviles */
+    .modal-content {
+        padding: 25px 20px;
+        width: 95%;
+    }
+
+    .modal-content h3 {
+        margin-top: -25px;
+        margin-left: -20px;
+        margin-right: -20px;
+        font-size: 20px;
+    }
+
+    .modal-actions {
+        flex-direction: column; /* Apilamos los botones de Guardar y Cancelar */
+        width: 100%;
+    }
+
+    .modal-actions button {
+        width: 100%;
+    }
 }

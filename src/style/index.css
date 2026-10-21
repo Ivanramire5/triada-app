@@ -1,16 +1,29 @@
-
-body{
-
+/* =========================================
+   ESTILOS GENERALES (Escritorio / Computadora)
+   ========================================= */
+body {
+    margin: 0; /* Añadí esto: es una buena práctica para que no queden bordes blancos a los costados */
     padding: 0px;
     box-sizing: border-box;
     background-color: #FAF3EE;
-
     font-family: 'Poppins', sans-serif; 
     color: #1E232A;
     text-align: center;
 }
-.h1App{
+
+.h1App {
     font-size: 2.5rem;
     margin-bottom: 20px;
     text-align: left;
+}
+
+/* =========================================
+   MEDIA QUERY PARA CELULARES (Responsive)
+   ========================================= */
+@media (max-width: 768px) {
+    .h1App {
+        font-size: 1.8rem; /* Achicamos el título para que no desborde en pantallas angostas */
+        text-align: center; /* En móviles, los títulos principales suelen quedar mejor centrados, pero puedes cambiarlo a 'left' si lo prefieres */
+        margin-bottom: 15px;
+    }
 }

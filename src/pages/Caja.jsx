@@ -10,17 +10,16 @@ export default function Caja() {
 
     const fetchCajaData = async () => {
         try {
-            const token = localStorage.getItem('token');
-
-            // 2. Armamos la cabecera con la credencial de autorización
+            // Configuramos la petición para que el navegador envíe la cookie automáticamente
             const requestOptions = {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` 
+                    'Content-Type': 'application/json'
                 }
             };
-            // 1. EL CAMBIO CLAVE: Asegurarnos de usar la ruta /turno-actual
+            
+            // Hacemos las peticiones seguras
             const [resProductos, resMovimientos] = await Promise.all([
                 fetch('http://localhost:5168/api/productos', requestOptions),
                 fetch('http://localhost:5168/api/transacciones/movimientos/turno-actual', requestOptions) 
@@ -53,7 +52,7 @@ export default function Caja() {
                 };
             });
 
-            // 2. EL FILTRO VISUAL: Quitamos del gráfico los productos con $0 para que desaparezcan al cerrar caja
+            // Quitamos del gráfico los productos con $0
             const dataFiltrada = dataAgrupada.filter(item => item.ingresos > 0);
             
             // Ordenamos de mayor a menor ingreso
@@ -76,20 +75,16 @@ export default function Caja() {
     const handleCerrarCaja = async () => {
         if(window.confirm('¿Estás seguro de Cerrar la Caja? Esto reiniciará las ventas a cero para el próximo turno.')) {
             try {
-                // 1. Obtenemos el token de la memoria
-                const token = localStorage.getItem('token');
-
-                // 2. Le avisamos a C# que guarde la marca, enviando nuestra llave VIP
+                // Le avisamos a C# enviando la cookie de sesión de forma invisible
                 const response = await fetch('http://localhost:5168/api/transacciones/cerrar-turno', {
                     method: 'POST',
+                    credentials: 'include', 
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}` // EL CAMBIO CLAVE
+                        'Content-Type': 'application/json'
                     }
                 });
 
                 if (response.ok) {
-                    // Volvemos a consultar los datos (como ahora hay un cierre, traerá 0 ventas)
                     fetchCajaData(); 
                 } else {
                     alert("Hubo un error al cerrar la caja.");

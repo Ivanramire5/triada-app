@@ -10,12 +10,12 @@ export default function Metrics() {
     useEffect(() => {
         const fetchMetricsData = async () => {
             try {
-                const token = localStorage.getItem('token');
+                // La nueva forma segura sin tocar localStorage
                 const requestOptions = {
                     method: 'GET',
+                    credentials: 'include', // <-- Envía la cookie automáticamente
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Content-Type': 'application/json'
                     }
                 };
 

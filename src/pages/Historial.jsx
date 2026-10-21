@@ -8,15 +8,12 @@ export default function Historial() {
     // Cargar el historial desde el backend
     const fetchHistory = async () => {
     try {
-        // 1. Obtenemos el token de la sesión
-        const token = localStorage.getItem('token');
-
-        // 2. Adjuntamos los headers con la autorización en la petición
+        // Hacemos la petición enviando la cookie de seguridad automáticamente
         const response = await fetch('http://localhost:5168/api/transacciones/movimientos', {
-            method: 'GET', // Aunque sea GET, debemos especificarlo para poder pasar los headers
+            method: 'GET', 
+            credentials: 'include',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Aquí enviamos la llave
+                'Content-Type': 'application/json'
             }
         });
 
@@ -69,7 +66,8 @@ export default function Historial() {
             if (result.isConfirmed) {
                 try {
                     await fetch('http://localhost:5168/api/transacciones/movimientos/limpiar', {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        credentials: 'include' // <-- Envía la cookie
                     });
                     
                     fetchHistory(); // Recargamos la lista
@@ -102,7 +100,8 @@ export default function Historial() {
             if (result.isConfirmed) {
                 try {
                     await fetch(`http://localhost:5168/api/transacciones/movimientos/${id}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        credentials: 'include' // <-- Envía la cookie
                     });
                     
                     fetchHistory(); // Recargamos la lista

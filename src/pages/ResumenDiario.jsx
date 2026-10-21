@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import "../style/caja.css"; // Reutilizamos estilos de la caja
+import "../style/caja.css"; 
 
 export default function ResumenDiario() {
     const [resumen, setResumen] = useState([]);
@@ -7,15 +7,12 @@ export default function ResumenDiario() {
     useEffect(() => {
     const fetchResumen = async () => {
         try {
-            // 1. Obtenemos el token de la memoria
-            const token = localStorage.getItem('token');
-
-            // 2. Hacemos la petición adjuntando la llave de seguridad
+            // Hacemos la petición enviando la cookie de seguridad automáticamente
             const response = await fetch('http://localhost:5168/api/transacciones/resumen-diario', {
                 method: 'GET',
+                credentials: 'include',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Aquí va el token
+                    'Content-Type': 'application/json'
                 }
             });
             

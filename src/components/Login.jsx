@@ -2,14 +2,9 @@ import { useState } from 'react';
 import Swal from 'sweetalert2';
 
 export default function Login({ onLoginSuccess }) {
-
-    
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,22 +14,16 @@ export default function Login({ onLoginSuccess }) {
             // Hacemos la petición al nuevo endpoint de C#
             const response = await fetch('http://localhost:5168/api/auth/login', {
                 method: 'POST',
+                credentials: 'include', // <-- Clave para que el navegador acepte y guarde la cookie de sesión
                 headers: { 'Content-Type': 'application/json' },
-                // Enviamos los datos aunque por ahora el backend asigne el Tenant 1 por defecto
                 body: JSON.stringify({ email, password }) 
             });
 
             if (response.ok) {
-                const data = await response.json();
-                
-                // 1. Guardamos el token
-                localStorage.setItem('token', data.token);
-                
-                // --- NUEVO: Guardamos el nombre o correo del usuario ---
-                // (Por ahora usamos el email que ingresó en el formulario)
+                // Guardamos únicamente el nombre o correo del usuario para la UI
                 localStorage.setItem('userName', email); 
                 
-                // 2. Le avisamos a App.jsx que ya podemos entrar
+                // Le avisamos a App.jsx que ya podemos entrar
                 onLoginSuccess();
 
                 window.location.href = '/';
@@ -105,6 +94,15 @@ export default function Login({ onLoginSuccess }) {
                     >
                         {loading ? 'Ingresando...' : 'Iniciar Sesión'}
                     </button>
+                    {/* ENLACE DE RECUPERACIÓN DE CONTRASEÑA */}
+                    <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                        <a 
+                            href="/forgot-password" 
+                            style={{ color: '#134B68', textDecoration: 'none', fontSize: '14px', fontWeight: '500' }}
+                        >
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>

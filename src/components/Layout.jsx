@@ -2,18 +2,28 @@ import { Outlet, Link } from 'react-router-dom';
 import '../style/layout.css';
 
 export default function Layout() {
-// 1. Verificamos si el usuario está conectado leyendo la memoria
-    const token = localStorage.getItem('token');
-    const userName = localStorage.getItem('userName') || 'Usuario'; // Lee el nombre guardado
+    // 1. Verificamos si el usuario está conectado leyendo la memoria no crítica
+    const isAuthenticated = localStorage.getItem('userName') !== null;
+    const userName = localStorage.getItem('userName') || 'Usuario'; 
 
-    const handleLogout = () => {
-        localStorage.removeItem('token'); 
-        localStorage.removeItem('userName'); // Limpiamos también el nombre
+    const handleLogout = async () => {
+        try {
+            // Le pedimos a C# que destruya la cookie HttpOnly
+            await fetch('http://localhost:5168/api/auth/logout', { 
+                method: 'POST', 
+                credentials: 'include' 
+            });
+        } catch (error) {
+            console.error("Error al cerrar sesión", error);
+        }
+        
+        // Limpiamos la memoria visual y redirigimos
+        localStorage.removeItem('userName'); 
         window.location.href = '/login';  
     };
 
     const handleLogin = () => {
-        window.location.href = '/login';  // Si no está logueado, lo mandamos al login
+        window.location.href = '/login';  
     };
 
     return (
@@ -23,11 +33,11 @@ export default function Layout() {
             <header className="topbar">
                 <h1 className="app-title">Triada</h1>
                 
-                {/* 2. NUEVO: Contenedor para el Nombre + Botón */}
+                {/* 2. Contenedor para el Nombre + Botón */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     
-                    {token ? (
-                        /* Si HAY token: Mostramos Nombre y botón de Salir */
+                    {isAuthenticated ? (
+                        /* Si está autenticado: Mostramos Nombre y botón de Salir */
                         <>
                             <span style={{ color: '#FAF3EE', fontWeight: 'bold', fontSize: '1.1rem' }}>
                                 <i className="bi bi-person-circle" style={{ marginRight: '8px' }}></i>
@@ -38,7 +48,7 @@ export default function Layout() {
                             </button>
                         </>
                     ) : (
-                        /* Si NO HAY token: Mostramos solo el botón de Entrar */
+                        /* Si NO está autenticado: Mostramos solo el botón de Entrar */
                         <button 
                             className="logout-button" 
                             style={{ backgroundColor: '#134B68', border: '1px solid white' }} 
@@ -76,6 +86,7 @@ export default function Layout() {
                             Resumen Diario
                         </Link>
                         <Link to="/proveedores" className="nav-link">
+                            <i className="bi bi-truck"></i>
                             Agenda de Proveedores
                         </Link>
                     </nav>

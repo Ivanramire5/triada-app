@@ -1,3 +1,6 @@
+/* =========================================
+   ESTILOS ORIGINALES (Escritorio / Computadora)
+   ========================================= */
 .metrics-container {
     padding: 20px;
 }
@@ -70,4 +73,49 @@
     width: 100%;
     height: 400px;
     margin-top: 20px;
+}
+
+/* =========================================
+   MEDIA QUERY PARA CELULARES (Responsive)
+   ========================================= */
+@media (max-width: 768px) {
+    .metrics-container {
+        padding: 10px; /* Reducimos el padding general para ganar espacio */
+    }
+
+    .metrics-title {
+        font-size: 24px;
+        margin-top: 10px;
+    }
+
+    .metrics-card {
+        padding: 15px; /* Tarjetas un poco más compactas */
+    }
+
+    .metrics-subtitle {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .metrics-empty {
+        font-size: 16px;
+    }
+
+    .metrics-item {
+        font-size: 15px;
+        /* Si el nombre del producto es muy largo, permitimos que el número baje */
+        flex-wrap: wrap; 
+        gap: 5px;
+    }
+
+    .metrics-category {
+        font-size: 13px;
+        margin-left: 5px;
+        margin-right: 10px;
+    }
+
+    .chart-container {
+        height: 300px; /* Hacemos el gráfico un poco más bajo para que no ocupe toda la pantalla del celu */
+        margin-top: 15px;
+    }
 }

@@ -1,9 +1,37 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../style/landingPage.css'; // Importamos los estilos
 
 export const LandingPage = () => {
     const navigate = useNavigate();
+    const [loadingPago, setLoadingPago] = useState(false);
+
+    const handleSuscripcion = async () => {
+        setLoadingPago(true);
+        try {
+            const response = await fetch('http://localhost:5170/api/pagos/crear-suscripcion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: "cliente@test.com" })
+            });
+
+            // Leemos la respuesta cruda como texto para que no falle si no es un JSON
+            const textResponse = await response.text();
+            console.log("🔍 RESPUESTA CRUDA DEL BACKEND:", textResponse);
+
+            if (response.ok) {
+                const data = JSON.parse(textResponse);
+                window.location.href = data.linkPago;
+            } else {
+                alert("El servidor rechazó el pago. Revisa la consola (F12) para ver el detalle.");
+            }
+        } catch (error) {
+            console.error("Error de red o de código:", error);
+        } finally {
+            setLoadingPago(false);
+        }
+    };
 
     return (
         <div className="landing-container">
@@ -78,8 +106,12 @@ export const LandingPage = () => {
                             <li>✅ Soporte 24/7</li>
                             <li>✅ Respaldos diarios</li>
                         </ul>
-                        <button className="btn-plan">
-                            Elegir Mensual
+                        <button 
+                            className="btn-plan" 
+                            onClick={handleSuscripcion} 
+                            disabled={loadingPago}
+                        >
+                            {loadingPago ? 'Procesando...' : 'Elegir Mensual'}
                         </button>
                     </div>
 

@@ -12,7 +12,7 @@ import Historial from "./pages/Historial";
 import ResumenDiario from './pages/ResumenDiario'; 
 import Proveedores from './pages/Proveedores'; 
 import Login from "./components/Login"; 
-import { LandingPage } from "./components/LandingPage"; // Asegúrate de que coincida con tu export
+import { LandingPage } from "./pages/LandingPage"; // Asegúrate de que coincida con tu export
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
